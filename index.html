@@ -2,194 +2,429 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Добавить задачу</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: Arial, sans-serif; 
-      background: #f0f0f0;
-      padding: 20px;
+    :root {
+      --light-bg: #d7dce3;
+      --dark-bg: #1a2f40;
+      --accent: #dc143c;
+      --text-dark: #1a2f40;
+      --text-light: #ffffff;
+      --input-padding: 14px;
+      --border-radius: 8px;
+    }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-dark);
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 10px;
       min-height: 100vh;
+      height: 100vh;
     }
     .container {
-      background: white;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      background-color: var(--text-light);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 400px;
+      padding: 15px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      max-height: 96vh;
     }
-    h1 { text-align: center; margin-bottom: 20px; color: #333; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input, button {
-      width: 100%;
+    header {
+      background-color: var(--dark-bg);
       padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      margin: 0 0 15px 0;
+      flex-shrink: 0;
     }
-    button {
-      background: #4285f4;
+    header h1 {
+      font-size: 1.3rem;
+      color: var(--text-light);
+      font-weight: 600;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow: hidden;
+    }
+    .form-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      overflow: hidden;
+      justify-content: space-between;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #444;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: var(--input-padding);
+      border: 2px solid #ccc;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      min-height: 44px;
+    }
+    input:focus {
+      border-color: var(--accent);
+    }
+    input[type="file"] {
+      padding: 10px;
+      background-color: #f8f9fa;
+    }
+    input[type="file"]::file-selector-button {
+      padding: 8px 12px;
+      background-color: var(--dark-bg);
       color: white;
       border: none;
+      border-radius: 4px;
+      font-size: 0.9rem;
       cursor: pointer;
-      margin-top: 10px;
     }
-    button:hover { background: #3367d6; }
-    button:disabled { background: #ccc; cursor: not-allowed; }
+    button {
+      padding: 14px;
+      background-color: var(--accent);
+      color: var(--text-light);
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      min-height: 50px;
+      flex-shrink: 0;
+      margin-top: auto;
+    }
+    button:hover, button:active {
+      background-color: #b0102f;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    
+    /* Стили для индикатора загрузки */
     .loader {
       display: none;
-      text-align: center;
-      padding: 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
     }
+    
     .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #4285f4;
-      border-radius: 50%;
       width: 40px;
       height: 40px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid var(--accent);
       animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
     }
+    
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .message {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 5px;
+    
+    .loader-text {
+      color: white;
+      margin-top: 12px;
+      font-size: 1rem;
       text-align: center;
-      display: none;
     }
-    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    
+    .loader-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Медиа-запросы для адаптивности */
+    @media (max-width: 480px) {
+      body {
+        padding: 8px;
+      }
+      
+      .container {
+        padding: 12px;
+        max-height: 98vh;
+      }
+      
+      header {
+        padding: 10px;
+        margin-bottom: 12px;
+      }
+      
+      header h1 {
+        font-size: 1.2rem;
+      }
+      
+      input[type="text"],
+      input[type="date"],
+      input[type="number"],
+      input[type="file"] {
+        padding: 12px;
+        font-size: 16px;
+      }
+      
+      button {
+        padding: 12px;
+        font-size: 1rem;
+      }
+      
+      .spinner {
+        width: 35px;
+        height: 35px;
+        border-width: 3px;
+      }
+      
+      .loader-text {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Для очень маленьких экранов */
+    @media (max-width: 350px) and (max-height: 650px) {
+      header h1 {
+        font-size: 1.1rem;
+      }
+      
+      input[type="text"],
+      input[type="date"],
+      input[type="number"],
+      input[type="file"] {
+        padding: 10px;
+        min-height: 40px;
+      }
+      
+      button {
+        padding: 10px;
+        font-size: 0.95rem;
+        min-height: 45px;
+      }
+      
+      .form-group {
+        gap: 4px;
+      }
+      
+      label {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Для landscape ориентации */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        align-items: flex-start;
+        padding-top: 5px;
+        padding-bottom: 5px;
+      }
+      
+      .container {
+        max-height: 98vh;
+        overflow-y: auto;
+      }
+      
+      header {
+        padding: 8px;
+      }
+      
+      header h1 {
+        font-size: 1.1rem;
+      }
+    }
+
+    /* Для очень высоких экранов */
+    @media (min-height: 800px) {
+      .container {
+        max-height: 90vh;
+      }
+      
+      form {
+        gap: 16px;
+      }
+      
+      .form-group {
+        gap: 8px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>📝 Добавить задачу</h1>
+    <header>
+      <h1>ДОБАВИТЬ ЗАДАЧУ</h1>
+    </header>
     <form id="form">
-      <div class="form-group">
-        <label for="taskName">Название задачи:</label>
-        <input type="text" id="taskName" placeholder="Введите название задачи" required>
+      <div class="form-content">
+        <div class="form-group">
+          <label for="taskName">Название задачи</label>
+          <input type="text" id="taskName" placeholder="Введите название задачи" required>
+        </div>
+
+        <div class="form-group">
+          <label for="lastDate">Последняя дата выполнения</label>
+          <input type="date" id="lastDate" required>
+        </div>
+
+        <div class="form-group">
+          <label for="periodicity">Периодичность (дней)</label>
+          <input type="number" id="periodicity" min="1" value="7" required>
+        </div>
+
+        <div class="form-group">
+          <label for="photo">Фотография (необязательно)</label>
+          <input type="file" id="photo" accept="image/*">
+        </div>
+
+        <button type="submit" id="submit-btn">Добавить задачу</button>
       </div>
-      
-      <div class="form-group">
-        <label for="lastDate">Дата выполнения:</label>
-        <input type="date" id="lastDate" required>
-      </div>
-      
-      <div class="form-group">
-        <label for="photo">Фотография (необязательно):</label>
-        <input type="file" id="photo" accept="image/*">
-      </div>
-      
-      <button type="submit" id="submit-btn">✅ Добавить задачу</button>
     </form>
-    
-    <div class="loader" id="loader">
+  </div>
+  
+  <!-- Индикатор загрузки -->
+  <div class="loader" id="loader">
+    <div class="loader-content">
       <div class="spinner"></div>
-      <div>Добавление задачи...</div>
+      <div class="loader-text">Добавление задачи...</div>
     </div>
-    
-    <div id="message" class="message"></div>
   </div>
 
   <script>
-    // ЗАМЕНИ НА СВОЙ URL Google Apps Script!
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqoWyOUNomqOb8l-fwXI-S1nndj6UnkbIxNorjrLgY-jgUfShHOB-6aHYk2OGJCJCwlA/exec';
+    // ЗАМЕНИТЕ НА ВАШ URL Google Apps Script!
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx2W8nBS0vxamGcOD8JpLxMfoN5Y_0-VkD0fULvTt0yZPKOsFiwkXdaVrdTPmRshZ6auA/exec';
     
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('form');
-      const submitBtn = document.getElementById('submit-btn');
-      const loader = document.getElementById('loader');
-      const messageDiv = document.getElementById('message');
+    // Элементы DOM
+    const form = document.getElementById('form');
+    const submitBtn = document.getElementById('submit-btn');
+    const loader = document.getElementById('loader');
+    
+    // Функция для проверки, помещается ли форма на экране
+    function checkFormFitsScreen() {
+      const formHeight = document.querySelector('.container').offsetHeight;
+      const windowHeight = window.innerHeight;
       
-      // Устанавливаем сегодняшнюю дату
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('lastDate').value = today;
+      if (formHeight > windowHeight) {
+        // Если форма не помещается, немного уменьшаем отступы
+        document.querySelector('.container').style.padding = '10px';
+        document.querySelector('header').style.padding = '8px';
+        document.querySelector('header').style.marginBottom = '8px';
+        document.querySelectorAll('input').forEach(input => {
+          input.style.padding = '10px';
+          input.style.minHeight = '40px';
+        });
+        document.querySelector('button').style.padding = '10px';
+        document.querySelector('button').style.minHeight = '45px';
+      }
+    }
+    
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
       
-      // Функция для показа сообщений
-      function showMessage(text, isError = false) {
-        messageDiv.textContent = text;
-        messageDiv.className = isError ? 'error' : 'success';
-        messageDiv.style.display = 'block';
-        setTimeout(() => {
-          messageDiv.style.display = 'none';
-        }, 5000);
+      const taskName = document.getElementById('taskName').value.trim();
+      const lastDate = document.getElementById('lastDate').value;
+      const periodicity = document.getElementById('periodicity').value;
+      const fileInput = document.getElementById('photo');
+      
+      if (!taskName || !lastDate || !periodicity) {
+        alert('Заполните все обязательные поля.');
+        return;
       }
       
-      form.addEventListener('submit', async function(e) {
-        e.preventDefault();
+      // Блокируем кнопку и показываем индикатор загрузки
+      submitBtn.disabled = true;
+      loader.style.display = 'flex';
+      
+      try {
+        // Преобразуем дату в формат DD.MM.YYYY
+        const dateParts = lastDate.split('-');
+        const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
         
-        const taskName = document.getElementById('taskName').value.trim();
-        const lastDate = document.getElementById('lastDate').value;
-        const fileInput = document.getElementById('photo');
+        // Подготавливаем данные для отправки
+        const formData = {
+          taskName: taskName,
+          lastDate: formattedDate,
+          periodicity: periodicity
+        };
         
-        if (!taskName || !lastDate) {
-          showMessage('Заполните название задачи и дату выполнения.', true);
-          return;
+        // Если есть фото, добавляем его данные
+        if (fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          const base64Data = await readFileAsBase64(file);
+          formData.base64 = base64Data;
+          formData.mimeType = file.type;
+          formData.fileName = file.name;
         }
         
-        submitBtn.disabled = true;
-        loader.style.display = 'block';
-        messageDiv.style.display = 'none';
+        // Отправка с mode: 'no-cors' и параметром nocache
+        const response = await fetch(SCRIPT_URL + '?nocache=' + Date.now(), {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
         
-        try {
-          // Преобразуем дату в формат DD.MM.YYYY
-          const dateParts = lastDate.split('-');
-          const formattedDate = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`;
-          
-          // Подготавливаем данные для отправки
-          const formData = {
-            taskName: taskName,
-            lastDate: formattedDate // Используем отформатированную дату
-          };
-          
-          // Если есть фото, добавляем его данные
-          if (fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const base64Data = await readFileAsBase64(file);
-            formData.base64 = base64Data;
-            formData.mimeType = file.type;
-            formData.fileName = file.name;
-          }
-          
-          console.log('Отправка данных:', formData);
-          
-          // Отправка с mode: 'no-cors' и параметром nocache
-          const response = await fetch(SCRIPT_URL + '?nocache=' + Date.now(), {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-          });
-          
-          // При mode: 'no-cors' мы не можем прочитать ответ, но запрос отправлен
-          console.log('Запрос отправлен (no-cors mode)');
-          
-          // Показываем успешное сообщение (мы не можем проверить ответ при no-cors)
-          showMessage('✅ Задача успешно добавлена!');
-          form.reset();
-          // Устанавливаем сегодняшнюю дату снова
-          document.getElementById('lastDate').value = today;
-          
-        } catch (error) {
-          console.error('Ошибка:', error);
-          showMessage('❌ Ошибка при отправке: ' + error.message, true);
-        } finally {
-          loader.style.display = 'none';
-          submitBtn.disabled = false;
-        }
-      });
+        // При mode: 'no-cors' мы не можем прочитать ответ, но запрос отправлен
+        console.log('Запрос отправлен (no-cors mode)');
+        
+        // Показываем успешное сообщение (мы не можем проверить ответ при no-cors)
+        alert('✅ Задача успешно добавлена!');
+        document.getElementById('form').reset();
+        // Устанавливаем сегодняшнюю дату снова и периодичность по умолчанию
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('lastDate').value = today;
+        document.getElementById('periodicity').value = '7';
+        
+      } catch (error) {
+        console.error('Ошибка:', error);
+        alert('❌ Произошла ошибка при добавлении задачи.');
+      } finally {
+        // Скрываем индикатор загрузки
+        loader.style.display = 'none';
+        submitBtn.disabled = false;
+      }
     });
 
     // Функция для чтения файла как base64
@@ -205,6 +440,18 @@
         reader.readAsDataURL(file);
       });
     }
+
+    // Улучшение UX: фокус на первом поле при загрузке
+    window.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('lastDate').value = today;
+      document.getElementById('taskName').focus();
+      // Проверяем, помещается ли форма на экране
+      setTimeout(checkFormFitsScreen, 100);
+    });
+    
+    // Также проверяем при изменении размера окна
+    window.addEventListener('resize', checkFormFitsScreen);
   </script>
 </body>
 </html>
