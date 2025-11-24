@@ -137,6 +137,26 @@
       cursor: not-allowed;
     }
     
+    /* Специальные стили для поля даты */
+    input[type="date"] {
+      /* Убираем стандартный стиль браузера */
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      position: relative;
+    }
+    
+    /* Стили для плейсхолдера даты */
+    input[type="date"]:before {
+      content: attr(placeholder);
+      position: absolute;
+      color: #999;
+      background: #fff;
+      padding: 0 5px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    
     /* Стили для индикатора загрузки */
     .loader {
       display: none;
@@ -204,7 +224,16 @@
       input[type="number"],
       input[type="file"] {
         padding: 12px;
-        font-size: 16px;
+        font-size: 16px; /* Предотвращает масштабирование в iOS */
+        max-width: 100%;
+      }
+      
+      /* Дополнительные стили для поля даты на мобильных устройствах */
+      input[type="date"] {
+        min-width: 0; /* Позволяет полю сжиматься */
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       
       button {
@@ -235,6 +264,12 @@
       input[type="file"] {
         padding: 10px;
         min-height: 40px;
+        font-size: 14px; /* Уменьшаем размер шрифта на очень маленьких экранах */
+      }
+      
+      /* Дополнительные настройки для поля даты на очень маленьких экранах */
+      input[type="date"] {
+        font-size: 14px;
       }
       
       button {
@@ -272,6 +307,15 @@
       header h1 {
         font-size: 1.1rem;
       }
+      
+      /* Уменьшаем высоту полей ввода в landscape */
+      input[type="text"],
+      input[type="date"],
+      input[type="number"],
+      input[type="file"] {
+        padding: 8px 10px;
+        min-height: 36px;
+      }
     }
 
     /* Для очень высоких экранов */
@@ -307,11 +351,10 @@
           <input type="date" id="lastDate" required>
         </div>
 
-<div class="form-group">
-  <label for="periodicity">Периодичность (дней)</label>
-  <input type="number" id="periodicity" min="1" required>
-</div>
-
+        <div class="form-group">
+          <label for="periodicity">Периодичность (дней)</label>
+          <input type="number" id="periodicity" min="1" required>
+        </div>
 
         <div class="form-group">
           <label for="photo">Фотография (необязательно)</label>
@@ -339,6 +382,7 @@
     const form = document.getElementById('form');
     const submitBtn = document.getElementById('submit-btn');
     const loader = document.getElementById('loader');
+    const dateInput = document.getElementById('lastDate');
     
     // Функция для проверки, помещается ли форма на экране
     function checkFormFitsScreen() {
@@ -357,6 +401,15 @@
         document.querySelector('button').style.padding = '10px';
         document.querySelector('button').style.minHeight = '45px';
       }
+    }
+    
+    // Функция для форматирования даты для отображения
+    function formatDateForDisplay(dateString) {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}.${month}.${year}`;
     }
     
     form.addEventListener('submit', async function(e) {
@@ -449,10 +502,23 @@
       document.getElementById('taskName').focus();
       // Проверяем, помещается ли форма на экране
       setTimeout(checkFormFitsScreen, 100);
+      
+      // Устанавливаем минимальную ширину для контейнера, чтобы поле даты не сжималось слишком сильно
+      const container = document.querySelector('.container');
+      container.style.minWidth = '280px'; // Минимальная ширина для удобного использования
     });
     
     // Также проверяем при изменении размера окна
     window.addEventListener('resize', checkFormFitsScreen);
+    
+    // Обработчик для изменения размера шрифта в поле даты при изменении размера экрана
+    window.addEventListener('resize', function() {
+      if (window.innerWidth <= 350) {
+        dateInput.style.fontSize = '14px';
+      } else {
+        dateInput.style.fontSize = '16px';
+      }
+    });
   </script>
 </body>
 </html>
